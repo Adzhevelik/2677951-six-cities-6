@@ -6,13 +6,15 @@ import OfferPage from './pages/offer-page/offer-page';
 import NotFoundPage from './pages/not-found-page/not-found-page';
 import PrivateRoute from './components/private-route/private-route';
 import { Offer } from './types/offer';
+import { Review } from './types/review';
 
 type AppProps = {
   offersCount: number;
   offers: Offer[];
+  reviews: Review[];
 }
 
-function App({ offersCount, offers }: AppProps): JSX.Element {
+function App({ offersCount, offers, reviews }: AppProps): JSX.Element {
   return (
     <BrowserRouter>
       <Routes>
@@ -26,7 +28,7 @@ function App({ offersCount, offers }: AppProps): JSX.Element {
             </PrivateRoute>
           }
         />
-        <Route path="/offer/:id" element={<OfferPage />} />
+        <Route path="/offer/:id" element={<OfferPage offers={offers} reviews={reviews} />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
