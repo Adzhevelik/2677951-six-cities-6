@@ -1,24 +1,12 @@
+import { Link } from 'react-router-dom';
+import { Offer } from '../../types/offer';
+
 type OfferCardProps = {
-  id: string;
-  title: string;
-  type: string;
-  price: number;
-  rating: number;
-  isPremium: boolean;
-  isFavorite: boolean;
-  imageSrc: string;
+  offer: Offer;
 };
 
-function OfferCard({
-  id,
-  title,
-  type,
-  price,
-  rating,
-  isPremium,
-  isFavorite,
-  imageSrc,
-}: OfferCardProps): JSX.Element {
+function OfferCard({ offer }: OfferCardProps): JSX.Element {
+  const { id, title, type, price, rating, isPremium, isFavorite, previewImage } = offer;
   const ratingWidth = `${Math.round(rating) * 20}%`;
 
   return (
@@ -29,15 +17,15 @@ function OfferCard({
         </div>
       )}
       <div className="cities__image-wrapper place-card__image-wrapper">
-        <a href={`/offer/${id}`}>
+        <Link to={`/offer/${id}`}>
           <img
             className="place-card__image"
-            src={imageSrc}
+            src={previewImage}
             width={260}
             height={200}
             alt="Place image"
           />
-        </a>
+        </Link>
       </div>
       <div className="place-card__info">
         <div className="place-card__price-wrapper">
@@ -70,7 +58,7 @@ function OfferCard({
           </div>
         </div>
         <h2 className="place-card__name">
-          <a href={`/offer/${id}`}>{title}</a>
+          <Link to={`/offer/${id}`}>{title}</Link>
         </h2>
         <p className="place-card__type">{type}</p>
       </div>

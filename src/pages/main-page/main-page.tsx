@@ -1,63 +1,12 @@
-import OfferCard from '../../components/offer-card/offer-card';
+import { Offer } from '../../types/offer';
+import OfferList from '../../components/offer-list/offer-list';
 
 type MainPageProps = {
   offersCount: number;
+  offers: Offer[];
 };
 
-const MOCK_OFFERS = [
-  {
-    id: 'a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d',
-    title: 'Beautiful & luxurious apartment at great location',
-    type: 'Apartment',
-    price: 120,
-    rating: 4.8,
-    isPremium: true,
-    isFavorite: false,
-    imageSrc: 'img/apartment-01.jpg',
-  },
-  {
-    id: 'b2c3d4e5-f6a7-5b6c-9d0e-1f2a3b4c5d6e',
-    title: 'Wood and stone place',
-    type: 'Room',
-    price: 80,
-    rating: 4.0,
-    isPremium: false,
-    isFavorite: true,
-    imageSrc: 'img/room.jpg',
-  },
-  {
-    id: 'c3d4e5f6-a7b8-6c7d-0e1f-2a3b4c5d6e7f',
-    title: 'Canal View Prinsengracht',
-    type: 'Apartment',
-    price: 132,
-    rating: 4.5,
-    isPremium: false,
-    isFavorite: false,
-    imageSrc: 'img/apartment-02.jpg',
-  },
-  {
-    id: 'd4e5f6a7-b8c9-7d8e-1f2a-3b4c5d6e7f8a',
-    title: 'Nice, cozy, warm big bed apartment',
-    type: 'Apartment',
-    price: 180,
-    rating: 5.0,
-    isPremium: true,
-    isFavorite: false,
-    imageSrc: 'img/apartment-03.jpg',
-  },
-  {
-    id: 'e5f6a7b8-c9d0-8e9f-2a3b-4c5d6e7f8a9b',
-    title: 'Wood and stone place',
-    type: 'Room',
-    price: 80,
-    rating: 4.0,
-    isPremium: false,
-    isFavorite: true,
-    imageSrc: 'img/room-small.jpg',
-  },
-];
-
-function MainPage({offersCount}: MainPageProps): JSX.Element {
+function MainPage({ offersCount, offers }: MainPageProps): JSX.Element {
   return (
     <div className="page page--gray page--main">
       <header className="header">
@@ -145,21 +94,7 @@ function MainPage({offersCount}: MainPageProps): JSX.Element {
                   <li className="places__option" tabIndex={0}>Top rated first</li>
                 </ul>
               </form>
-              <div className="cities__places-list places__list tabs__content">
-                {MOCK_OFFERS.map((offer) => (
-                  <OfferCard
-                    key={offer.id}
-                    id={offer.id}
-                    title={offer.title}
-                    type={offer.type}
-                    price={offer.price}
-                    rating={offer.rating}
-                    isPremium={offer.isPremium}
-                    isFavorite={offer.isFavorite}
-                    imageSrc={offer.imageSrc}
-                  />
-                ))}
-              </div>
+              <OfferList offers={offers} />
             </section>
             <div className="cities__right-section">
               <section className="cities__map map"></section>
