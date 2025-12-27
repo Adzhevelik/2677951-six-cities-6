@@ -5,7 +5,7 @@ function NotFoundPage(): JSX.Element {
         <div className="container">
           <div className="header__wrapper">
             <div className="header__left">
-              <a className="header__logo-link" href="main.html">
+              <a className="header__logo-link" href="/">
                 <img
                   className="header__logo"
                   src="img/logo.svg"
@@ -23,7 +23,7 @@ function NotFoundPage(): JSX.Element {
         <div className="container">
           <section className="error">
             <h1 className="error__title">404. Page not found</h1>
-            <a className="error__link" href="main.html">
+            <a className="error__link" href="/">
               Go to main page
             </a>
           </section>
