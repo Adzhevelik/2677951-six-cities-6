@@ -1,29 +1,60 @@
+import { FormEvent, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState, AppDispatch } from '../../store';
+import { login } from '../../store/action';
+import { AuthorizationStatus } from '../../constants/auth';
+
+const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d).+$/;
+
 function LoginPage(): JSX.Element {
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  const authorizationStatus = useSelector((state: RootState) => state.authorizationStatus);
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (authorizationStatus === AuthorizationStatus.Auth) {
+      navigate('/');
+    }
+  }, [authorizationStatus, navigate]);
+
+  const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {
+    evt.preventDefault();
+    setError('');
+
+    if (!PASSWORD_REGEX.test(password)) {
+      setError('Password must include letters and numbers');
+      return;
+    }
+
+    if (email && password) {
+      dispatch(login({ email, password }));
+    }
+  };
+
   return (
     <div className="page page--gray page--login">
       <header className="header">
         <div className="container">
           <div className="header__wrapper">
             <div className="header__left">
-              <a className="header__logo-link" href="main.html">
-                <img
-                  className="header__logo"
-                  src="img/logo.svg"
-                  alt="6 cities logo"
-                  width={81}
-                  height={41}
-                />
+              <a className="header__logo-link" href="/">
+                <img className="header__logo" src="img/logo.svg" alt="6 cities logo" width={81} height={41} />
               </a>
             </div>
           </div>
         </div>
       </header>
-
       <main className="page__main page__main--login">
         <div className="page__login-container container">
           <section className="login">
             <h1 className="login__title">Sign in</h1>
-            <form className="login__form form" action="#" method="post">
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+            <form className="login__form form" onSubmit={handleSubmit}>
               <div className="login__input-wrapper form__input-wrapper">
                 <label className="visually-hidden">E-mail</label>
                 <input
@@ -32,6 +63,8 @@ function LoginPage(): JSX.Element {
                   name="email"
                   placeholder="Email"
                   required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div className="login__input-wrapper form__input-wrapper">
@@ -42,12 +75,11 @@ function LoginPage(): JSX.Element {
                   name="password"
                   placeholder="Password"
                   required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
-              <button
-                className="login__submit form__submit button"
-                type="submit"
-              >
+              <button className="login__submit form__submit button" type="submit">
                 Sign in
               </button>
             </form>
