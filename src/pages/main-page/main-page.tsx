@@ -6,6 +6,7 @@ import OfferList from '../../components/offer-list/offer-list';
 import Map from '../../components/map/map';
 import SortOptions from '../../components/sort-options/sort-options';
 import CityList from '../../components/city-list/city-list';
+import Spinner from '../../components/spinner/spinner';
 import { SortType } from '../../constants/sort';
 import { sortOffers } from '../../utils/sort';
 import { Offer } from '../../types/offer';
@@ -14,6 +15,7 @@ function MainPage(): JSX.Element {
   const dispatch = useDispatch();
   const city = useSelector((state: RootState) => state.city);
   const offers = useSelector((state: RootState) => state.offers);
+  const isOffersLoading = useSelector((state: RootState) => state.isOffersLoading);
 
   const [currentSort, setCurrentSort] = useState<SortType>(SortType.Popular);
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
@@ -24,6 +26,10 @@ function MainPage(): JSX.Element {
   const handleCityChange = (newCity: string) => {
     dispatch(changeCity(newCity));
   };
+
+  if (isOffersLoading) {
+    return <Spinner />;
+  }
 
   return (
     <div className="page page--gray page--main">
