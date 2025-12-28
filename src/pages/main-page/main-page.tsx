@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
-import { changeCity } from '../../store/action';
+import { changeCity, logout } from '../../store/action';
 import OfferList from '../../components/offer-list/offer-list';
 import Map from '../../components/map/map';
 import SortOptions from '../../components/sort-options/sort-options';
@@ -10,12 +10,16 @@ import Spinner from '../../components/spinner/spinner';
 import { SortType } from '../../constants/sort';
 import { sortOffers } from '../../utils/sort';
 import { Offer } from '../../types/offer';
+import { AuthorizationStatus } from '../../constants/auth';
+import { AppDispatch } from '../../store';
 
 function MainPage(): JSX.Element {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const city = useSelector((state: RootState) => state.city);
   const offers = useSelector((state: RootState) => state.offers);
   const isOffersLoading = useSelector((state: RootState) => state.isOffersLoading);
+  const authorizationStatus = useSelector((state: RootState) => state.authorizationStatus);
+  const user = useSelector((state: RootState) => state.user);
 
   const [currentSort, setCurrentSort] = useState<SortType>(SortType.Popular);
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
@@ -25,6 +29,11 @@ function MainPage(): JSX.Element {
 
   const handleCityChange = (newCity: string) => {
     dispatch(changeCity(newCity));
+  };
+
+  const handleLogout = (evt: React.MouseEvent<HTMLAnchorElement>) => {
+    evt.preventDefault();
+    dispatch(logout());
   };
 
   if (isOffersLoading) {
@@ -43,18 +52,29 @@ function MainPage(): JSX.Element {
             </div>
             <nav className="header__nav">
               <ul className="header__nav-list">
-                <li className="header__nav-item user">
-                  <a className="header__nav-link header__nav-link--profile" href="#">
-                    <div className="header__avatar-wrapper user__avatar-wrapper"></div>
-                    <span className="header__user-name user__name">Oliver.conner@gmail.com</span>
-                    <span className="header__favorite-count">3</span>
-                  </a>
-                </li>
-                <li className="header__nav-item">
-                  <a className="header__nav-link" href="#">
-                    <span className="header__signout">Sign out</span>
-                  </a>
-                </li>
+                {authorizationStatus === AuthorizationStatus.Auth && user ? (
+                  <>
+                    <li className="header__nav-item user">
+                      <a className="header__nav-link header__nav-link--profile" href="#">
+                        <div className="header__avatar-wrapper user__avatar-wrapper"></div>
+                        <span className="header__user-name user__name">{user.email}</span>
+                        <span className="header__favorite-count">3</span>
+                      </a>
+                    </li>
+                    <li className="header__nav-item">
+                      <a className="header__nav-link" href="#" onClick={handleLogout}>
+                        <span className="header__signout">Sign out</span>
+                      </a>
+                    </li>
+                  </>
+                ) : (
+                  <li className="header__nav-item user">
+                    <a className="header__nav-link header__nav-link--profile" href="/login">
+                      <div className="header__avatar-wrapper user__avatar-wrapper"></div>
+                      <span className="header__login">Sign in</span>
+                    </a>
+                  </li>
+                )}
               </ul>
             </nav>
           </div>
