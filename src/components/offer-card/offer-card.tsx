@@ -1,6 +1,10 @@
-import { Link } from 'react-router-dom';
+import React, { useCallback } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from '../../store';
+import { toggleFavorite } from '../../store/action';
 import { Offer } from '../../types/offer';
-import React from 'react';
+import { AuthorizationStatus } from '../../constants/auth';
 
 type OfferCardProps = {
   offer: Offer;
@@ -9,6 +13,20 @@ type OfferCardProps = {
 function OfferCard({ offer }: OfferCardProps): JSX.Element {
   const { id, title, type, price, rating, isPremium, isFavorite, previewImage } = offer;
   const ratingWidth = `${Math.round(rating) * 20}%`;
+
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const authorizationStatus = useSelector((state: RootState) => state.user.authorizationStatus);
+
+  const handleFavoriteClick = useCallback(() => {
+    if (authorizationStatus !== AuthorizationStatus.Auth) {
+      navigate('/login');
+      return;
+    }
+
+    const status = isFavorite ? 0 : 1;
+    dispatch(toggleFavorite({ offerId: id, status }));
+  }, [authorizationStatus, isFavorite, id, dispatch, navigate]);
 
   return (
     <article className="cities__card place-card">
@@ -39,6 +57,7 @@ function OfferCard({ offer }: OfferCardProps): JSX.Element {
               isFavorite ? 'place-card__bookmark-button--active' : ''
             }`}
             type="button"
+            onClick={handleFavoriteClick}
           >
             <svg
               className="place-card__bookmark-icon"

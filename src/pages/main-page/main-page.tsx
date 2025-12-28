@@ -8,10 +8,12 @@ import Map from '../../components/map/map';
 import SortOptions from '../../components/sort-options/sort-options';
 import CityList from '../../components/city-list/city-list';
 import Spinner from '../../components/spinner/spinner';
+import MainEmpty from '../../components/main-empty/main-empty';
 import { SortType } from '../../constants/sort';
 import { sortOffers } from '../../utils/sort';
 import { Offer } from '../../types/offer';
 import { AuthorizationStatus } from '../../constants/auth';
+import { Link } from 'react-router-dom';
 
 function MainPage(): JSX.Element {
   const dispatch = useDispatch<AppDispatch>();
@@ -20,6 +22,7 @@ function MainPage(): JSX.Element {
   const isOffersLoading = useSelector((state: RootState) => state.offers.isLoading);
   const authorizationStatus = useSelector((state: RootState) => state.user.authorizationStatus);
   const user = useSelector((state: RootState) => state.user.user);
+  const favorites = useSelector((state: RootState) => state.favorites.favorites);
 
   const [currentSort, setCurrentSort] = useState<SortType>(SortType.Popular);
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
@@ -62,11 +65,11 @@ function MainPage(): JSX.Element {
                 {authorizationStatus === AuthorizationStatus.Auth && user ? (
                   <>
                     <li className="header__nav-item user">
-                      <a className="header__nav-link header__nav-link--profile" href="#">
+                      <Link className="header__nav-link header__nav-link--profile" to="/favorites">
                         <div className="header__avatar-wrapper user__avatar-wrapper"></div>
                         <span className="header__user-name user__name">{user.email}</span>
-                        <span className="header__favorite-count">3</span>
-                      </a>
+                        <span className="header__favorite-count">{favorites.length}</span>
+                      </Link>
                     </li>
                     <li className="header__nav-item">
                       <a className="header__nav-link" href="#" onClick={handleLogout}>
@@ -91,19 +94,26 @@ function MainPage(): JSX.Element {
         <h1 className="visually-hidden">Cities</h1>
         <CityList currentCity={city} onCityChange={handleCityChange} />
         <div className="cities">
-          <div className="cities__places-container container">
-            <section className="cities__places places">
-              <h2 className="visually-hidden">Places</h2>
-              <b className="places__found">{cityOffers.length} places to stay in {city}</b>
-              <SortOptions currentSort={currentSort} onSortChange={setCurrentSort} />
-              <OfferList offers={sortedOffers} onOfferHover={setSelectedOffer} />
-            </section>
-            <div className="cities__right-section">
-              <section className="cities__map map">
-                <Map offers={cityOffers} selectedOffer={selectedOffer} />
-              </section>
+          {cityOffers.length === 0 ? (
+            <div className="cities__places-container cities__places-container--empty container">
+              <MainEmpty city={city} />
+              <div className="cities__right-section"></div>
             </div>
-          </div>
+          ) : (
+            <div className="cities__places-container container">
+              <section className="cities__places places">
+                <h2 className="visually-hidden">Places</h2>
+                <b className="places__found">{cityOffers.length} places to stay in {city}</b>
+                <SortOptions currentSort={currentSort} onSortChange={setCurrentSort} />
+                <OfferList offers={sortedOffers} onOfferHover={setSelectedOffer} />
+              </section>
+              <div className="cities__right-section">
+                <section className="cities__map map">
+                  <Map offers={cityOffers} selectedOffer={selectedOffer} />
+                </section>
+              </div>
+            </div>
+          )}
         </div>
       </main>
     </div>
