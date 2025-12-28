@@ -15,11 +15,11 @@ function OfferPage(): JSX.Element {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
 
-  const currentOffer = useSelector((state: RootState) => state.currentOffer);
-  const nearbyOffers = useSelector((state: RootState) => state.nearbyOffers);
-  const comments = useSelector((state: RootState) => state.comments);
-  const authorizationStatus = useSelector((state: RootState) => state.authorizationStatus);
-  const user = useSelector((state: RootState) => state.user);
+  const currentOffer = useSelector((state: RootState) => state.currentOffer.currentOffer);
+  const nearbyOffers = useSelector((state: RootState) => state.currentOffer.nearbyOffers);
+  const comments = useSelector((state: RootState) => state.comments.comments);
+  const authorizationStatus = useSelector((state: RootState) => state.user.authorizationStatus);
+  const user = useSelector((state: RootState) => state.user.user);
 
   useEffect(() => {
     if (id) {
