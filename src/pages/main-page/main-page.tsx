@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../../store';
-import { changeCity, logout } from '../../store/action';
+import { RootState, AppDispatch } from '../../store';
+import { changeCity } from '../../store/slices/city-slice';
+import { logout } from '../../store/action';
 import OfferList from '../../components/offer-list/offer-list';
 import Map from '../../components/map/map';
 import SortOptions from '../../components/sort-options/sort-options';
@@ -11,30 +12,36 @@ import { SortType } from '../../constants/sort';
 import { sortOffers } from '../../utils/sort';
 import { Offer } from '../../types/offer';
 import { AuthorizationStatus } from '../../constants/auth';
-import { AppDispatch } from '../../store';
 
 function MainPage(): JSX.Element {
   const dispatch = useDispatch<AppDispatch>();
-  const city = useSelector((state: RootState) => state.city);
-  const offers = useSelector((state: RootState) => state.offers);
-  const isOffersLoading = useSelector((state: RootState) => state.isOffersLoading);
-  const authorizationStatus = useSelector((state: RootState) => state.authorizationStatus);
-  const user = useSelector((state: RootState) => state.user);
+  const city = useSelector((state: RootState) => state.city.currentCity);
+  const offers = useSelector((state: RootState) => state.offers.offers);
+  const isOffersLoading = useSelector((state: RootState) => state.offers.isLoading);
+  const authorizationStatus = useSelector((state: RootState) => state.user.authorizationStatus);
+  const user = useSelector((state: RootState) => state.user.user);
 
   const [currentSort, setCurrentSort] = useState<SortType>(SortType.Popular);
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
 
-  const cityOffers = offers.filter((offer) => offer.city.name === city);
-  const sortedOffers = sortOffers(cityOffers, currentSort);
+  const cityOffers = useMemo(
+    () => offers.filter((offer) => offer.city.name === city),
+    [offers, city]
+  );
 
-  const handleCityChange = (newCity: string) => {
+  const sortedOffers = useMemo(
+    () => sortOffers(cityOffers, currentSort),
+    [cityOffers, currentSort]
+  );
+
+  const handleCityChange = useCallback((newCity: string) => {
     dispatch(changeCity(newCity));
-  };
+  }, [dispatch]);
 
-  const handleLogout = (evt: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleLogout = useCallback((evt: React.MouseEvent<HTMLAnchorElement>) => {
     evt.preventDefault();
     dispatch(logout());
-  };
+  }, [dispatch]);
 
   if (isOffersLoading) {
     return <Spinner />;

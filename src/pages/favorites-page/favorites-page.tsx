@@ -3,7 +3,7 @@ import { RootState } from '../../store';
 import OfferCard from '../../components/offer-card/offer-card';
 
 function FavoritesPage(): JSX.Element {
-  const offers = useSelector((state: RootState) => state.offers);
+  const offers = useSelector((state: RootState) => state.offers.offers);
   const favoriteOffers = offers.filter((offer) => offer.isFavorite);
 
   return (

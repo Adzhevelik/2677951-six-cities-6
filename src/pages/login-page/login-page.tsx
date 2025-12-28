@@ -10,7 +10,7 @@ const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d).+$/;
 function LoginPage(): JSX.Element {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const authorizationStatus = useSelector((state: RootState) => state.authorizationStatus);
+  const authorizationStatus = useSelector((state: RootState) => state.user.authorizationStatus);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

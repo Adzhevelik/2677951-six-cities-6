@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Offer } from '../../types/offer';
+import React from 'react';
 
 type OfferCardProps = {
   offer: Offer;
@@ -66,4 +67,5 @@ function OfferCard({ offer }: OfferCardProps): JSX.Element {
   );
 }
 
-export default OfferCard;
+const MemoizedOfferCard = React.memo(OfferCard);
+export default MemoizedOfferCard;
