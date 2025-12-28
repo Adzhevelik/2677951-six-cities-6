@@ -2,7 +2,13 @@ import { useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../../store';
-import { fetchOffer, fetchNearbyOffers, fetchComments, logout } from '../../store/action';
+import {
+  fetchOffer,
+  fetchNearbyOffers,
+  fetchComments,
+  logout,
+  toggleFavorite
+} from '../../store/action';
 import { AuthorizationStatus } from '../../constants/auth';
 import ReviewForm from '../../components/review-form/review-form';
 import ReviewList from '../../components/review-list/review-list';
@@ -15,11 +21,24 @@ function OfferPage(): JSX.Element {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
 
-  const currentOffer = useSelector((state: RootState) => state.currentOffer.currentOffer);
-  const nearbyOffers = useSelector((state: RootState) => state.currentOffer.nearbyOffers);
-  const comments = useSelector((state: RootState) => state.comments.comments);
-  const authorizationStatus = useSelector((state: RootState) => state.user.authorizationStatus);
-  const user = useSelector((state: RootState) => state.user.user);
+  const currentOffer = useSelector(
+    (state: RootState) => state.currentOffer.currentOffer
+  );
+  const nearbyOffers = useSelector(
+    (state: RootState) => state.currentOffer.nearbyOffers
+  );
+  const comments = useSelector(
+    (state: RootState) => state.comments.comments
+  );
+  const authorizationStatus = useSelector(
+    (state: RootState) => state.user.authorizationStatus
+  );
+  const user = useSelector(
+    (state: RootState) => state.user.user
+  );
+  const favorites = useSelector(
+    (state: RootState) => state.favorites.favorites
+  );
 
   useEffect(() => {
     if (id) {
@@ -32,6 +51,18 @@ function OfferPage(): JSX.Element {
       dispatch(fetchComments(id));
     }
   }, [id, dispatch, navigate]);
+
+  const handleFavoriteClick = () => {
+    if (authorizationStatus !== AuthorizationStatus.Auth) {
+      navigate('/login');
+      return;
+    }
+
+    if (currentOffer) {
+      const status = currentOffer.isFavorite ? 0 : 1;
+      dispatch(toggleFavorite({ offerId: currentOffer.id, status }));
+    }
+  };
 
   if (!currentOffer) {
     return <Spinner />;
@@ -60,10 +91,17 @@ function OfferPage(): JSX.Element {
                 {authorizationStatus === AuthorizationStatus.Auth && user ? (
                   <>
                     <li className="header__nav-item user">
-                      <a className="header__nav-link header__nav-link--profile" href="#">
+                      <a
+                        className="header__nav-link header__nav-link--profile"
+                        href="#"
+                      >
                         <div className="header__avatar-wrapper user__avatar-wrapper"></div>
-                        <span className="header__user-name user__name">{user.email}</span>
-                        <span className="header__favorite-count">3</span>
+                        <span className="header__user-name user__name">
+                          {user.email}
+                        </span>
+                        <span className="header__favorite-count">
+                          {favorites.length}
+                        </span>
                       </a>
                     </li>
                     <li className="header__nav-item">
@@ -95,6 +133,7 @@ function OfferPage(): JSX.Element {
           </div>
         </div>
       </header>
+
       <main className="page__main page__main--offer">
         <section className="offer">
           <div className="offer__gallery-container container">
@@ -110,6 +149,7 @@ function OfferPage(): JSX.Element {
               ))}
             </div>
           </div>
+
           <div className="offer__container container">
             <div className="offer__wrapper">
               {currentOffer.isPremium && (
@@ -117,11 +157,17 @@ function OfferPage(): JSX.Element {
                   <span>Premium</span>
                 </div>
               )}
+
               <div className="offer__name-wrapper">
                 <h1 className="offer__name">{currentOffer.title}</h1>
                 <button
-                  className="offer__bookmark-button button"
+                  className={`offer__bookmark-button button ${
+                    currentOffer.isFavorite
+                      ? 'offer__bookmark-button--active'
+                      : ''
+                  }`}
                   type="button"
+                  onClick={handleFavoriteClick}
                 >
                   <svg
                     className="offer__bookmark-icon"
@@ -133,10 +179,13 @@ function OfferPage(): JSX.Element {
                   <span className="visually-hidden">To bookmarks</span>
                 </button>
               </div>
+
               <div className="offer__rating rating">
                 <div className="offer__stars rating__stars">
                   <span
-                    style={{ width: `${(currentOffer.rating / 5) * 100}%` }}
+                    style={{
+                      width: `${(currentOffer.rating / 5) * 100}%`
+                    }}
                   >
                   </span>
                   <span className="visually-hidden">Rating</span>
@@ -145,6 +194,7 @@ function OfferPage(): JSX.Element {
                   {currentOffer.rating}
                 </span>
               </div>
+
               <ul className="offer__features">
                 <li className="offer__feature offer__feature--entire">
                   {currentOffer.type}
@@ -158,12 +208,14 @@ function OfferPage(): JSX.Element {
                   {currentOffer.maxAdults === 1 ? 'adult' : 'adults'}
                 </li>
               </ul>
+
               <div className="offer__price">
                 <b className="offer__price-value">
                   &euro;{currentOffer.price}
                 </b>
                 <span className="offer__price-text">&nbsp;night</span>
               </div>
+
               <div className="offer__inside">
                 <h2 className="offer__inside-title">What&apos;s inside</h2>
                 <ul className="offer__inside-list">
@@ -174,6 +226,7 @@ function OfferPage(): JSX.Element {
                   ))}
                 </ul>
               </div>
+
               {currentOffer.host && (
                 <div className="offer__host">
                   <h2 className="offer__host-title">Meet the host</h2>
@@ -207,16 +260,19 @@ function OfferPage(): JSX.Element {
                   </div>
                 </div>
               )}
+
               <ReviewList reviews={comments} />
               {authorizationStatus === AuthorizationStatus.Auth && (
                 <ReviewForm offerId={id!} />
               )}
             </div>
           </div>
+
           <section className="offer__map map">
             <Map offers={mapOffers} selectedOffer={currentOffer} />
           </section>
         </section>
+
         <div className="container">
           <section className="near-places places">
             <h2 className="near-places__title">

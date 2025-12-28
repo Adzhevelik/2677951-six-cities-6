@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Offer } from '../../types/offer';
-import { fetchOffer, fetchNearbyOffers } from '../action';
+import { fetchOffer, fetchNearbyOffers, toggleFavorite } from '../action';
 
 type CurrentOfferState = {
   currentOffer: Offer | null;
@@ -33,6 +33,16 @@ export const currentOfferSlice = createSlice({
       })
       .addCase(fetchNearbyOffers.fulfilled, (state, action) => {
         state.nearbyOffers = action.payload;
+      })
+      .addCase(toggleFavorite.fulfilled, (state, action) => {
+        const updatedOffer = action.payload;
+        if (state.currentOffer?.id === updatedOffer.id) {
+          state.currentOffer = updatedOffer;
+        }
+        const index = state.nearbyOffers.findIndex((offer) => offer.id === updatedOffer.id);
+        if (index !== -1) {
+          state.nearbyOffers[index] = updatedOffer;
+        }
       });
   },
 });

@@ -5,6 +5,7 @@ import { offersReducer } from './slices/offers-slice';
 import { currentOfferReducer } from './slices/current-offer-slice';
 import { userReducer } from './slices/user-slice';
 import { commentsReducer } from './slices/comments-slice';
+import { favoritesReducer } from './slices/favorites-slice';
 
 const api = createAPI();
 
@@ -14,6 +15,7 @@ const rootReducer = combineReducers({
   currentOffer: currentOfferReducer,
   user: userReducer,
   comments: commentsReducer,
+  favorites: favoritesReducer,
 });
 
 export const store = configureStore({
