@@ -1,21 +1,29 @@
 import { useState } from 'react';
-import { Offer } from '../../types/offer';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../../store';
+import { changeCity } from '../../store/action';
 import OfferList from '../../components/offer-list/offer-list';
 import Map from '../../components/map/map';
 import SortOptions from '../../components/sort-options/sort-options';
+import CityList from '../../components/city-list/city-list';
 import { SortType } from '../../constants/sort';
 import { sortOffers } from '../../utils/sort';
+import { Offer } from '../../types/offer';
 
-type MainPageProps = {
-  offersCount: number;
-  offers: Offer[];
-};
+function MainPage(): JSX.Element {
+  const dispatch = useDispatch();
+  const city = useSelector((state: RootState) => state.city);
+  const offers = useSelector((state: RootState) => state.offers);
 
-function MainPage({ offersCount, offers }: MainPageProps): JSX.Element {
   const [currentSort, setCurrentSort] = useState<SortType>(SortType.Popular);
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
 
-  const sortedOffers = sortOffers(offers, currentSort);
+  const cityOffers = offers.filter((offer) => offer.city.name === city);
+  const sortedOffers = sortOffers(cityOffers, currentSort);
+
+  const handleCityChange = (newCity: string) => {
+    dispatch(changeCity(newCity));
+  };
 
   return (
     <div className="page page--gray page--main">
@@ -48,53 +56,18 @@ function MainPage({ offersCount, offers }: MainPageProps): JSX.Element {
       </header>
       <main className="page__main page__main--index">
         <h1 className="visually-hidden">Cities</h1>
-        <div className="tabs">
-          <section className="locations container">
-            <ul className="locations__list tabs__list">
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item" href="#">
-                  <span>Paris</span>
-                </a>
-              </li>
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item" href="#">
-                  <span>Cologne</span>
-                </a>
-              </li>
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item" href="#">
-                  <span>Brussels</span>
-                </a>
-              </li>
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item tabs__item--active" href="#">
-                  <span>Amsterdam</span>
-                </a>
-              </li>
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item" href="#">
-                  <span>Hamburg</span>
-                </a>
-              </li>
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item" href="#">
-                  <span>Dusseldorf</span>
-                </a>
-              </li>
-            </ul>
-          </section>
-        </div>
+        <CityList currentCity={city} onCityChange={handleCityChange} />
         <div className="cities">
           <div className="cities__places-container container">
             <section className="cities__places places">
               <h2 className="visually-hidden">Places</h2>
-              <b className="places__found">{offersCount} places to stay in Amsterdam</b>
+              <b className="places__found">{cityOffers.length} places to stay in {city}</b>
               <SortOptions currentSort={currentSort} onSortChange={setCurrentSort} />
               <OfferList offers={sortedOffers} onOfferHover={setSelectedOffer} />
             </section>
             <div className="cities__right-section">
               <section className="cities__map map">
-                <Map offers={offers} selectedOffer={selectedOffer} />
+                <Map offers={cityOffers} selectedOffer={selectedOffer} />
               </section>
             </div>
           </div>
