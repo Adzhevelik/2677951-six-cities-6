@@ -47,6 +47,19 @@ function Map({ offers, selectedOffer }: MapProps): JSX.Element {
           .addTo(map.current);
       }
     }
+
+    if (map.current && offers.length > 0) {
+      const city = offers[0]?.city;
+      if (city) {
+        map.current.setView(
+          {
+            lat: city.location.latitude,
+            lng: city.location.longitude,
+          },
+          city.location.zoom
+        );
+      }
+    }
   }, [offers]);
 
   useEffect(() => {

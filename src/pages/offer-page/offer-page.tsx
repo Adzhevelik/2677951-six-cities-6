@@ -1,17 +1,14 @@
 import { Link } from 'react-router-dom';
-import { Offer } from '../../types/offer';
-import { Review } from '../../types/review';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
+import { reviews } from '../../mocks/reviews';
 import ReviewForm from '../../components/review-form/review-form';
 import ReviewList from '../../components/review-list/review-list';
 import Map from '../../components/map/map';
 import OfferCard from '../../components/offer-card/offer-card';
 
-type OfferPageProps = {
-  offers: Offer[];
-  reviews: Review[];
-};
-
-function OfferPage({ offers, reviews }: OfferPageProps): JSX.Element {
+function OfferPage(): JSX.Element {
+  const offers = useSelector((state: RootState) => state.offers);
   const nearbyOffers = offers.slice(0, 3);
 
   return (
