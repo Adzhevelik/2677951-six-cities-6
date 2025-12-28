@@ -8,10 +8,18 @@ import {
   setUser,
   checkAuth,
   login,
-  logout
+  logout,
+  setCurrentOffer,
+  setNearbyOffers,
+  setComments,
+  fetchOffer,
+  fetchNearbyOffers,
+  fetchComments,
+  postComment
 } from './action';
 import { Offer } from '../types/offer';
 import { User } from '../types/user';
+import { Review } from '../types/review';
 import { DEFAULT_CITY } from '../constants/cities';
 import { AuthorizationStatus } from '../constants/auth';
 
@@ -21,6 +29,9 @@ type State = {
   isOffersLoading: boolean;
   authorizationStatus: AuthorizationStatus;
   user: User | null;
+  currentOffer: Offer | null;
+  nearbyOffers: Offer[];
+  comments: Review[];
 };
 
 const initialState: State = {
@@ -29,6 +40,9 @@ const initialState: State = {
   isOffersLoading: false,
   authorizationStatus: AuthorizationStatus.Unknown,
   user: null,
+  currentOffer: null,
+  nearbyOffers: [],
+  comments: [],
 };
 
 export const reducer = createReducer(initialState, (builder) => {
@@ -75,5 +89,29 @@ export const reducer = createReducer(initialState, (builder) => {
     .addCase(logout.fulfilled, (state) => {
       state.user = null;
       state.authorizationStatus = AuthorizationStatus.NoAuth;
+    })
+    .addCase(setCurrentOffer, (state, action) => {
+      state.currentOffer = action.payload;
+    })
+    .addCase(setNearbyOffers, (state, action) => {
+      state.nearbyOffers = action.payload;
+    })
+    .addCase(setComments, (state, action) => {
+      state.comments = action.payload;
+    })
+    .addCase(fetchOffer.fulfilled, (state, action) => {
+      state.currentOffer = action.payload;
+    })
+    .addCase(fetchOffer.rejected, (state) => {
+      state.currentOffer = null;
+    })
+    .addCase(fetchNearbyOffers.fulfilled, (state, action) => {
+      state.nearbyOffers = action.payload;
+    })
+    .addCase(fetchComments.fulfilled, (state, action) => {
+      state.comments = action.payload;
+    })
+    .addCase(postComment.fulfilled, (state, action) => {
+      state.comments.push(action.payload);
     });
 });
